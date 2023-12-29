@@ -5,11 +5,12 @@ import axiosRetry from 'axios-retry';
 import axios from "axios";
 import yargs from "yargs";
 import chalk from "chalk";
-import members from "./data.js" ;
+import { promises as fs } from "fs";
+import { parse } from 'ini';
 
 const options = yargs
-    .usage("Usage: woredeem GIFTCODE [GROUP] [SUBGROUP]\nRedeems GIFTCODE for all entries in data file. Optionally specify GROUP/SUBGROUP to limit entries.")
-    .option("j", { alias: "json", describe: "JSON data file", type: "string", default: "data.json" })
+    .usage("Usage: woredeem GIFTCODE [GROUP] [SUBGROUP]\nRedeems GIFTCODE for all entries in ini file. Optionally specify GROUP/SUBGROUP to limit entries.")
+    .option("i", { alias: "ini", describe: "INI file", type: "string", default: "data.ini" })
     .option("d", { alias: "delay", describe: "delay between requests in ms", type: "number", default: 100 })
     .demandCommand(1, 'Giftcode not specified')
     .argv;
@@ -110,16 +111,31 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
  */
 const main = async() => {
     const w = 20; // Output column width
+    let data;
+
+    // Load csv file
+    process.stdout.write(chalk.green.bold('Loading data file...' + ' '.repeat(w-6)));
+
+    try {
+        data = parse(await fs.readFile(options.ini, {
+            encoding : 'utf-8'
+        }));
+    } catch (error) {
+        console.log(chalk.red.bold('[Failed] Unable to open "' + options.ini + '"'));
+        console.error(error);
+        return;
+    }
+    console.log(chalk.green.bold('[OK]'));
 
     // Validate code
-    process.stdout.write(chalk.green.bold('Validating gift code...' + ' '.repeat(w-9)));
+    process.stdout.write(chalk.green.bold('Validating gift code...' + ' '.repeat(w-9)));   
 
-    await getPlayer( 52945958 ); // Login
-    if (!await redeemCode('52945958', options._[0])) return;    
+    await getPlayer( Object.values(Object.values(data)[0])[0] ); // Login as 1st ID
+    if (!await redeemCode(Object.values(Object.values(data)[0])[0], options._[0])) return;    
 
     console.log(chalk.green.bold('[OK]'));
 
-    for (let [key, value] of Object.entries(members)) {
+    for (let [key, value] of Object.entries(data)) {
         let avgLvl = 0, cnt = 0;
 
         if (options._[1] && options._[1].toString() !== key) continue;
@@ -127,13 +143,12 @@ const main = async() => {
         console.log(chalk.green.bold('\nProcessing ' + chalk.white(key) + ':'));
         console.log(chalk.bold('-'.repeat(w+30)));
 
-        if (Array.isArray(value)) value = { '': value };
-
         for (const [key, value2] of Object.entries(value)) {
             if (options._[2] && options._[2].toString() !== key) continue;
-            if (key) console.log(key + ' - ' + value2.length + ' players');
+            console.log(key + ' - ' + value2.split(',').length + ' players');
 
-            for (let id of value2) {                        
+            for (let id of value2.split(',')) {
+                id = parseInt(id);
                 process.stdout.write(chalk.blue(id) + ' ');
 
                 // Get player info (and log them in)
