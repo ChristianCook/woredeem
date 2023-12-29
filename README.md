@@ -2,20 +2,20 @@
 
 ## Install
 
-1. Clone or download this repository.
-2. npm install -g
+1. Run `git clone https://github.com/ChristianCook/woredeem` to clone this repository.
+2. Run `npm install -g` to install.
 
 ## Usage
 
 `woredeem GIFTCODE [GROUP] [SUBGROUP]`
 
-Redeems GIFTCODE for all entries in data file. Optionally specify GROUP/SUBGROUP
+Redeems GIFTCODE for all entries in ini file. Optionally specify GROUP/SUBGROUP
 to limit entries.
 
-```
+<pre>
 Options:
   --help       Show help                                               [boolean]
   --version    Show version number                                     [boolean]
-  -j, --json   JSON data file                    [string] [default: "data.json"]
+  -i, --ini    INI file                           [string] [default: "data.ini"]
   -d, --delay  delay between requests in ms              [number] [default: 100]
-```
+</pre>
