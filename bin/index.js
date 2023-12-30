@@ -22,11 +22,9 @@ axiosRetry(axios, {
         return error.response.status === 429 ? true : false;
     },
     onRetry(retryCount) {
-        if (retryCount === 1) {
-            process.stdout.write('Too many requests. Retrying.');
-        } else {
-            process.stdout.write('.');
-        }
+        process.stdout.write(
+            retryCount === 1 ? 'Too many requests, retrying.' : '.'
+        );
     }
 });
 
@@ -111,18 +109,17 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
  */
 const main = async() => {
     const w = 20; // Output column width
-    let data;
 
     // Load csv file
-    process.stdout.write(chalk.green.bold('Loading data file...' + ' '.repeat(w-6)));
+    process.stdout.write(chalk.green.bold('Loading INI file...' + ' '.repeat(w-6)));
 
+    let data;
     try {
         data = parse(await fs.readFile(options.ini, {
             encoding : 'utf-8'
         }));
     } catch (error) {
         console.log(chalk.red.bold('[Failed] Unable to open "' + options.ini + '"'));
-        console.error(error);
         return;
     }
     console.log(chalk.green.bold('[OK]'));

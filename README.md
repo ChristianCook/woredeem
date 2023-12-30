@@ -3,7 +3,8 @@
 ## Install
 
 1. Run `git clone https://github.com/ChristianCook/woredeem` to clone this repository.
-2. Run `npm install -g` to install.
+2. Run `npm install` to install dependencies.
+3. Optionally run `npm install -g` to install the `woredeem` executable globally.
 
 ## Usage
 
@@ -19,3 +20,14 @@ Options:
   -i, --ini    INI file                           [string] [default: "data.ini"]
   -d, --delay  delay between requests in ms              [number] [default: 100]
 </pre>
+
+## INI example
+```
+[My alliance]
+; A comment
+R1=ID,ID,ID
+R2=ID,ID,ID
+
+[Alliance 2]
+Group1=ID,ID,ID
+```
